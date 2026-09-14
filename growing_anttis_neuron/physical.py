@@ -1,4 +1,4 @@
-"""Passive cable compilation for developed GrowingAnttisNeuron anatomy.
+"""Passive cable compilation and developed-input modal diagnostics.
 
 v1 keeps receiver dendrites fixed and lets development choose where sender inputs
 land on those cables.  The cable physics itself is therefore arm-independent.
@@ -10,7 +10,7 @@ import math
 
 import numpy as np
 
-from .development import DevelopmentResult
+from .development import DevelopmentResult, Synapse
 
 
 @dataclass(frozen=True)
@@ -58,6 +58,18 @@ class ReceiverCable:
     system_matrix: np.ndarray
     step_matrix: np.ndarray
     soma_index: int = 0
+
+
+@dataclass(frozen=True)
+class SynapsePhysicalMetrics:
+    """Physical diagnostics for one developed synaptic input port."""
+
+    compartment: int
+    visible_mode_effective_count: float
+    slow_target_decay: float | None
+    next_decay_gap: float | None
+    purification_time_95: float | None
+    soma_transfer_resistance: float
 
 
 def _minimum_spanning_tree(positions: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -212,3 +224,196 @@ def whitened_modes(cable: ReceiverCable) -> tuple[np.ndarray, np.ndarray]:
     if np.any(values <= 0.0):
         raise FloatingPointError("passive decay spectrum must be positive")
     return values, vectors
+
+
+def synapse_compartment(
+    result: DevelopmentResult,
+    synapse: Synapse,
+    cable: ReceiverCable,
+) -> int:
+    """Map a developed contact to the nearest dendritic cable compartment."""
+    if cable.receiver != synapse.receiver:
+        raise ValueError("synapse and cable must belong to the same receiver")
+    if synapse.receiver < 0 or synapse.receiver >= len(result.receivers):
+        raise ValueError("synapse receiver outside developed anatomy")
+    if len(cable.positions) <= 1:
+        raise ValueError("receiver cable has no dendritic compartments")
+
+    contact = np.asarray([synapse.x, synapse.y], dtype=float)
+    if not np.all(np.isfinite(contact)):
+        raise ValueError("synapse contact must be finite")
+    distances = np.sum((cable.positions[1:] - contact) ** 2, axis=1)
+    return 1 + int(np.argmin(distances))
+
+
+def _same_decay(left: float, right: float, rtol: float) -> bool:
+    return abs(left - right) <= rtol * max(1.0, abs(left), abs(right))
+
+
+def _group_excited_modes(
+    decays: np.ndarray,
+    energies: np.ndarray,
+    *,
+    degeneracy_rtol: float,
+    excitation_tol: float,
+) -> tuple[np.ndarray, np.ndarray]:
+    d = np.asarray(decays, dtype=float)
+    e = np.asarray(energies, dtype=float)
+    if d.ndim != 1 or e.ndim != 1 or d.shape != e.shape:
+        raise ValueError("decays and energies must be same-length vectors")
+    if not np.all(np.isfinite(d)) or np.any(d < 0.0):
+        raise ValueError("decays must be finite and non-negative")
+    if not np.all(np.isfinite(e)) or np.any(e < 0.0):
+        raise ValueError("energies must be finite and non-negative")
+    if not math.isfinite(degeneracy_rtol) or degeneracy_rtol <= 0.0:
+        raise ValueError("degeneracy_rtol must be finite and positive")
+    if not math.isfinite(excitation_tol) or excitation_tol <= 0.0:
+        raise ValueError("excitation_tol must be finite and positive")
+
+    keep = e > excitation_tol
+    if not np.any(keep):
+        return np.empty(0, dtype=float), np.empty(0, dtype=float)
+    d = d[keep]
+    e = e[keep]
+    order = np.argsort(d, kind="stable")
+    d = d[order]
+    e = e[order]
+
+    grouped_decay: list[float] = []
+    grouped_energy: list[float] = []
+    start = 0
+    while start < len(d):
+        stop = start + 1
+        while stop < len(d) and _same_decay(float(d[stop - 1]), float(d[stop]), degeneracy_rtol):
+            stop += 1
+        grouped_decay.append(float(np.mean(d[start:stop])))
+        grouped_energy.append(float(np.sum(e[start:stop])))
+        start = stop
+    return np.asarray(grouped_decay, dtype=float), np.asarray(grouped_energy, dtype=float)
+
+
+def purification_time(
+    decays: np.ndarray,
+    energies: np.ndarray,
+    *,
+    purity_target: float,
+    degeneracy_rtol: float,
+    excitation_tol: float,
+) -> float | None:
+    """Time until the slowest excited eigenspace carries the requested energy fraction."""
+    if not math.isfinite(purity_target) or not 0.0 < purity_target < 1.0:
+        raise ValueError("purity_target must lie strictly between zero and one")
+    grouped_decay, grouped_energy = _group_excited_modes(
+        decays,
+        energies,
+        degeneracy_rtol=degeneracy_rtol,
+        excitation_tol=excitation_tol,
+    )
+    if len(grouped_decay) == 0:
+        return None
+    if len(grouped_decay) == 1:
+        return 0.0
+
+    target_decay = float(grouped_decay[0])
+    target_energy = float(grouped_energy[0])
+    relative_decay = grouped_decay[1:] - target_decay
+    if np.any(relative_decay <= 0.0):
+        raise FloatingPointError("eigenspace grouping failed to separate decay rates")
+
+    def purity(time: float) -> float:
+        faster = np.sum(grouped_energy[1:] * np.exp(-2.0 * relative_decay * time))
+        return target_energy / (target_energy + float(faster))
+
+    if purity(0.0) >= purity_target:
+        return 0.0
+    upper = 1.0
+    for _ in range(256):
+        if purity(upper) >= purity_target:
+            break
+        upper *= 2.0
+    else:
+        raise FloatingPointError("failed to bracket passive purification time")
+
+    lower = 0.0
+    for _ in range(100):
+        midpoint = 0.5 * (lower + upper)
+        if purity(midpoint) >= purity_target:
+            upper = midpoint
+        else:
+            lower = midpoint
+    return float(upper)
+
+
+def _effective_count(energies: np.ndarray, excitation_tol: float) -> float:
+    values = np.asarray(energies, dtype=float)
+    values = values[values > excitation_tol]
+    if len(values) == 0:
+        return 0.0
+    probabilities = values / float(np.sum(values))
+    entropy = -float(np.sum(probabilities * np.log(probabilities)))
+    return float(math.exp(entropy))
+
+
+def synapse_physical_metrics(
+    result: DevelopmentResult,
+    synapse: Synapse,
+    config: PassiveCableConfig | None = None,
+) -> SynapsePhysicalMetrics:
+    """Measure how one developed synaptic port couples into passive receiver modes."""
+    cfg = config or PassiveCableConfig()
+    cable = compile_receiver_cable(result, synapse.receiver, cfg)
+    compartment = synapse_compartment(result, synapse, cable)
+    decays, vectors = whitened_modes(cable)
+
+    weighted_uniform = np.sqrt(cable.capacitance)
+    weighted_uniform /= float(np.linalg.norm(weighted_uniform))
+    uniform_index = int(np.argmax(np.abs(vectors.T @ weighted_uniform)))
+    keep = np.ones(len(decays), dtype=bool)
+    keep[uniform_index] = False
+    nonuniform_decays = decays[keep]
+    nonuniform_vectors = vectors[:, keep]
+
+    forcing = np.zeros(len(cable.capacitance), dtype=float)
+    forcing[compartment] = synapse.weight / math.sqrt(float(cable.capacitance[compartment]))
+    amplitudes = nonuniform_vectors.T @ forcing
+    energies = amplitudes * amplitudes
+    effective_count = _effective_count(energies, cfg.excitation_tol)
+
+    grouped_decay, _ = _group_excited_modes(
+        nonuniform_decays,
+        energies,
+        degeneracy_rtol=cfg.degeneracy_rtol,
+        excitation_tol=cfg.excitation_tol,
+    )
+    if len(grouped_decay) == 0:
+        slow_target_decay: float | None = None
+        next_decay_gap: float | None = None
+    else:
+        slow_target_decay = float(grouped_decay[0])
+        next_decay_gap = (
+            float(grouped_decay[1] - grouped_decay[0]) if len(grouped_decay) >= 2 else None
+        )
+
+    time_95 = purification_time(
+        nonuniform_decays,
+        energies,
+        purity_target=cfg.purity_target,
+        degeneracy_rtol=cfg.degeneracy_rtol,
+        excitation_tol=cfg.excitation_tol,
+    )
+
+    point_current = np.zeros(len(cable.capacitance), dtype=float)
+    point_current[compartment] = 1.0
+    dc_voltage = np.linalg.solve(cable.system_matrix, point_current)
+    soma_transfer = float(dc_voltage[cable.soma_index] * synapse.weight)
+    if not math.isfinite(soma_transfer):
+        raise FloatingPointError("non-finite soma transfer resistance")
+
+    return SynapsePhysicalMetrics(
+        compartment=compartment,
+        visible_mode_effective_count=effective_count,
+        slow_target_decay=slow_target_decay,
+        next_decay_gap=next_decay_gap,
+        purification_time_95=time_95,
+        soma_transfer_resistance=soma_transfer,
+    )
