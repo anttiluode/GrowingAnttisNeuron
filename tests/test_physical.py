@@ -4,6 +4,7 @@ import numpy as np
 
 from growing_anttis_neuron.development import develop
 from growing_anttis_neuron.physical import (
+    PassiveCableConfig,
     compile_receiver_cable,
     purification_time,
     synapse_compartment,
@@ -75,6 +76,35 @@ def test_guided_and_shuffled_have_identical_receiver_cable_physics() -> None:
         left_values, _ = whitened_modes(left)
         right_values, _ = whitened_modes(right)
         np.testing.assert_array_equal(left_values, right_values)
+
+
+def test_lineage_edges_freeze_branch_ancestry_while_geometry_scales() -> None:
+    result = develop(seed=0, arm="guided")
+    base = compile_receiver_cable(
+        result,
+        receiver=0,
+        config=PassiveCableConfig(dendrite_scale=1.0),
+    )
+    small = compile_receiver_cable(
+        result,
+        receiver=0,
+        config=PassiveCableConfig(dendrite_scale=0.7),
+        lineage_edges=base.edges,
+    )
+    large = compile_receiver_cable(
+        result,
+        receiver=0,
+        config=PassiveCableConfig(dendrite_scale=1.8),
+        lineage_edges=base.edges,
+    )
+
+    np.testing.assert_array_equal(small.edges, base.edges)
+    np.testing.assert_array_equal(large.edges, base.edges)
+    assert not np.array_equal(small.positions, large.positions)
+    assert not np.array_equal(small.capacitance, large.capacitance)
+    small_decay, _ = whitened_modes(small)
+    large_decay, _ = whitened_modes(large)
+    assert not np.allclose(small_decay, large_decay, rtol=1e-8, atol=1e-10)
 
 
 def test_synapse_assignment_uses_nearest_dendrite_of_matching_receiver() -> None:

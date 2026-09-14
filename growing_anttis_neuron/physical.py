@@ -116,6 +116,39 @@ def _minimum_spanning_tree(positions: np.ndarray) -> tuple[np.ndarray, np.ndarra
     return np.asarray(selected, dtype=int), np.asarray(lengths, dtype=float)
 
 
+def _validated_lineage_edges(lineage_edges: np.ndarray, n_nodes: int) -> np.ndarray:
+    """Validate a frozen branch ancestry without changing its edge order."""
+    raw = np.asarray(lineage_edges)
+    if raw.shape != (n_nodes - 1, 2):
+        raise ValueError("lineage_edges must have shape (n_nodes - 1, 2)")
+    if raw.dtype.kind not in "iu" or np.any(raw != raw.astype(int)):
+        raise ValueError("lineage_edges must contain integer node indices")
+    edges = raw.astype(int, copy=True)
+    if np.any(edges < 0) or np.any(edges >= n_nodes):
+        raise ValueError("lineage_edges contain node index outside cable")
+    if np.any(edges[:, 0] == edges[:, 1]):
+        raise ValueError("lineage_edges cannot contain self edges")
+    undirected = [tuple(sorted((int(left), int(right)))) for left, right in edges]
+    if len(set(undirected)) != len(undirected):
+        raise ValueError("lineage_edges cannot contain duplicate edges")
+
+    adjacency: list[list[int]] = [[] for _ in range(n_nodes)]
+    for left, right in edges:
+        adjacency[int(left)].append(int(right))
+        adjacency[int(right)].append(int(left))
+    seen = {0}
+    stack = [0]
+    while stack:
+        node = stack.pop()
+        for neighbor in adjacency[node]:
+            if neighbor not in seen:
+                seen.add(neighbor)
+                stack.append(neighbor)
+    if len(seen) != n_nodes:
+        raise ValueError("lineage_edges must form one connected tree")
+    return edges
+
+
 def _root_segment_lengths(
     n_nodes: int,
     edges: np.ndarray,
@@ -150,8 +183,16 @@ def compile_receiver_cable(
     result: DevelopmentResult,
     receiver: int,
     config: PassiveCableConfig | None = None,
+    *,
+    lineage_edges: np.ndarray | None = None,
 ) -> ReceiverCable:
-    """Compile one fixed receiver morphology into passive `C` and `G` matrices."""
+    """Compile one receiver morphology into passive `C` and `G` matrices.
+
+    Historical callers leave ``lineage_edges`` unset and retain the original
+    minimum-spanning-tree compilation.  Developmental growth experiments can
+    instead supply a previously established tree, preserving branch ancestry
+    while geometry, membrane area, capacitance, leak and axial conductance vary.
+    """
     cfg = config or PassiveCableConfig()
     if isinstance(receiver, bool) or not isinstance(receiver, int):
         raise ValueError("receiver must be an integer index")
@@ -167,7 +208,12 @@ def compile_receiver_cable(
     positions = np.vstack([soma, *dendrites])
     if cfg.dendrite_scale != 1.0:
         positions[1:] = soma + cfg.dendrite_scale * (positions[1:] - soma)
-    edges, lengths = _minimum_spanning_tree(positions)
+
+    if lineage_edges is None:
+        edges, lengths = _minimum_spanning_tree(positions)
+    else:
+        edges = _validated_lineage_edges(lineage_edges, len(positions))
+        lengths = np.linalg.norm(positions[edges[:, 0]] - positions[edges[:, 1]], axis=1)
     rooted_lengths = _root_segment_lengths(len(positions), edges, lengths, root=0)
 
     area = np.empty(len(positions), dtype=float)
