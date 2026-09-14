@@ -13,6 +13,7 @@
   const meanPathEl = document.getElementById("mean-path");
   const branchEl = document.getElementById("branch-count");
 
+  const ARMS = new Set(["guided", "shuffled_labels", "random_walk"]);
   const N = 8, STEPS = 56, STEP = 0.025, CAPTURE = 0.05, SIGMA = 0.11, THRESHOLD = 0.72;
   const turns = [-60,-30,0,30,60].map(v => v * Math.PI / 180);
   let sim, paused = false, last = 0;
@@ -29,6 +30,7 @@
   function reset() {
     const seed = Number(seedEl.value) || 0;
     const arm = armEl.value;
+    if (!ARMS.has(arm)) throw new Error(`unknown developmental arm: ${arm}`);
     const growthRng = rngFromSeed(seed * 9973 + 9107);
     const labelRng = rngFromSeed(seed * 9973 + 9106);
     const y = ys();
