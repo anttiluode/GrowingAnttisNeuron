@@ -18,6 +18,24 @@ def test_label_shuffle_preserves_exact_molecular_multisets() -> None:
     assert guided.receptor_assignment != shuffled.receptor_assignment
 
 
+def test_label_shuffle_does_not_consume_the_growth_noise_stream() -> None:
+    config = DevelopmentConfig(
+        n_senders=6,
+        n_receivers=6,
+        steps=32,
+        chemo_weight=0.0,
+        branch_probability=0.12,
+    )
+    guided = develop(seed=21, arm="guided", config=config)
+    shuffled = develop(seed=21, arm="shuffled_labels", config=config)
+
+    guided_paths = [np.asarray(branch.points) for branch in guided.branches]
+    shuffled_paths = [np.asarray(branch.points) for branch in shuffled.branches]
+    assert len(guided_paths) == len(shuffled_paths)
+    for left, right in zip(guided_paths, shuffled_paths):
+        assert np.array_equal(left, right)
+
+
 def test_connectivity_matrix_has_sender_by_receiver_shape() -> None:
     config = DevelopmentConfig(n_senders=5, n_receivers=7, steps=48)
     result = develop(seed=4, arm="guided", config=config)
