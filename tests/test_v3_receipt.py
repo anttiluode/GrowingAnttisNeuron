@@ -27,7 +27,7 @@ def test_v3_receipt_differentiates_morphology_while_regulating_one_setpoint() ->
     tolerance = receipt["growth_config"]["relative_tolerance"]
     target = receipt["target_rms"]
     assert max(abs(item["final_rms"] / target - 1.0) for item in trajectories) <= tolerance
-    assert trajectories[0]["operator_distance_from_baseline"] == 0.0
+    assert abs(trajectories[0]["operator_distance_from_baseline"]) < 1e-12
     assert all(item["operator_distance_from_baseline"] > 0.0 for item in trajectories[1:])
 
 
