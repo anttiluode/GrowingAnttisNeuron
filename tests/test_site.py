@@ -19,6 +19,18 @@ def test_pages_shell_exposes_developmental_controls_and_authority_note() -> None
     assert 'src="site.js"' in html
 
 
+def test_pages_reports_frozen_v1_physical_bridge_without_browser_solver() -> None:
+    html = Path("index.html").read_text(encoding="utf-8")
+    script = Path("site.js").read_text(encoding="utf-8")
+
+    assert "v1 physical bridge" in html.lower()
+    assert "Python receipt" in html
+    assert "purification" in html.lower()
+    assert "identical passive cable" in html.lower()
+    assert "physical.py" not in script
+    assert "purification_time" not in script
+
+
 def test_pages_assets_are_plain_static_files() -> None:
     script = Path("site.js").read_text(encoding="utf-8")
     css = Path("site.css").read_text(encoding="utf-8")

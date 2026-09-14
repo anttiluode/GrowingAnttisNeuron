@@ -22,5 +22,7 @@ jobs:
         run: pytest -q
       - name: Pages JavaScript syntax
         run: node --check site.js
-      - name: Scientific smoke run
+      - name: v0 scientific smoke run
         run: python experiments/run_v0.py --seeds 4 --out /tmp/v0-smoke.json
+      - name: v1 scientific smoke run
+        run: python experiments/run_v1.py --seeds 4 --out /tmp/v1-smoke.json
