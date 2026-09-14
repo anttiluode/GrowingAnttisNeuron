@@ -139,6 +139,13 @@ def _seed_receipt(
     }
 
 
+def _v1_cable_config_dict(config: PassiveCableConfig) -> dict[str, float]:
+    """Serialize only parameters that existed when the v1 receipt was frozen."""
+    values = asdict(config)
+    values.pop("dendrite_scale", None)
+    return values
+
+
 def run(
     *,
     seeds: Iterable[int],
@@ -189,7 +196,7 @@ def run(
         ),
         "seeds": seed_list,
         "development_config": asdict(dev_cfg),
-        "cable_config": asdict(cable_cfg),
+        "cable_config": _v1_cable_config_dict(cable_cfg),
         "aggregate": aggregate,
         "per_seed": per_seed,
         "interpretation": (
