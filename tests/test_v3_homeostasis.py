@@ -33,7 +33,7 @@ def test_equal_power_temporal_correlation_changes_local_voltage_rms() -> None:
     ]
 
     assert all(np.isfinite(values))
-    assert all(left < right for left, right in zip(values, values[1:], strict=True))
+    assert all(left < right for left, right in zip(values[:-1], values[1:], strict=True))
 
 
 def test_fixed_lineage_growth_reduces_local_response() -> None:
@@ -97,7 +97,7 @@ def test_one_local_homeostat_differentiates_identical_starting_dendrites() -> No
     assert all(item.converged for item in grown)
     scales = [item.final_scale for item in grown]
     assert abs(scales[0] - 1.0) < 1e-12
-    assert all(left < right for left, right in zip(scales, scales[1:], strict=True))
+    assert all(left < right for left, right in zip(scales[:-1], scales[1:], strict=True))
     assert max(abs(item.final_rms / target - 1.0) for item in grown) <= config.relative_tolerance
 
     spectra = []
