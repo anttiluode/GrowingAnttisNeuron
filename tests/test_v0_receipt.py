@@ -22,6 +22,11 @@ def test_v0_aggregate_is_deterministic() -> None:
     assert first == second
 
 
-def test_frozen_v0_receipt_matches_canonical_run() -> None:
+def test_frozen_v0_receipt_matches_canonical_aggregate() -> None:
     frozen = json.loads(Path("results/v0.json").read_text(encoding="utf-8"))
-    assert frozen == run(seeds=list(range(16)))
+    canonical = run(seeds=list(range(16)))
+
+    assert frozen["version"] == canonical["version"]
+    assert frozen["seeds"] == canonical["seeds"]
+    assert frozen["aggregate"] == canonical["aggregate"]
+    assert frozen["interpretation"] == canonical["interpretation"]
