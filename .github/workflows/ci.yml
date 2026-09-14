@@ -18,5 +18,14 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install
         run: python -m pip install -e ".[test]"
+      - name: Generate canonical v0 receipt
+        if: matrix.python-version == '3.11'
+        run: python experiments/run_v0.py --seeds 16 --out /tmp/v0.json
+      - name: Upload canonical v0 receipt
+        if: matrix.python-version == '3.11'
+        uses: actions/upload-artifact@v4
+        with:
+          name: v0-receipt
+          path: /tmp/v0.json
       - name: Tests
         run: pytest -q
