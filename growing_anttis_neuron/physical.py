@@ -27,6 +27,7 @@ class PassiveCableConfig:
     degeneracy_rtol: float = 1e-8
     excitation_tol: float = 1e-12
     purity_target: float = 0.95
+    dendrite_scale: float = 1.0
 
     def __post_init__(self) -> None:
         positive = (
@@ -39,6 +40,7 @@ class PassiveCableConfig:
             self.dt,
             self.degeneracy_rtol,
             self.excitation_tol,
+            self.dendrite_scale,
         )
         if not all(math.isfinite(value) and value > 0.0 for value in positive):
             raise ValueError("passive cable parameters must be finite and positive")
@@ -163,6 +165,8 @@ def compile_receiver_cable(
         if point.receiver == receiver
     ]
     positions = np.vstack([soma, *dendrites])
+    if cfg.dendrite_scale != 1.0:
+        positions[1:] = soma + cfg.dendrite_scale * (positions[1:] - soma)
     edges, lengths = _minimum_spanning_tree(positions)
     rooted_lengths = _root_segment_lengths(len(positions), edges, lengths, root=0)
 
