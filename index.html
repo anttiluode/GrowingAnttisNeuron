@@ -4,19 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>GrowingAnttisNeuron — Developmental Microscope</title>
-  <meta name="description" content="A tiny chemoaffinity-style developmental system grows a connectivity matrix, then freezes it for operator analysis.">
+  <meta name="description" content="A tiny developmental system grows a connectivity matrix, then compiles developed contacts into passive cable input ports.">
   <link rel="stylesheet" href="site.css">
 </head>
 <body>
   <main class="shell">
     <header class="hero">
       <div>
-        <p class="eyebrow">GrowingAnttisNeuron / v0</p>
+        <p class="eyebrow">GrowingAnttisNeuron / v0 development + v1 physical bridge</p>
         <h1>Grow the matrix first.</h1>
-        <p class="lead">Fixed dendritic targets. Branching axons. Molecular address gradients. Then freeze the anatomy and ask what operator it became.</p>
+        <p class="lead">Fixed dendritic targets. Branching axons. Molecular address gradients. Then freeze the anatomy and ask how developed inputs enter a physical cable basis.</p>
       </div>
       <div class="wall">
-        <span>development</span><b>→</b><span>geometry</span><b>→</b><span>synapses</span><b>→</b><span>operator</span>
+        <span>development</span><b>→</b><span>geometry</span><b>→</b><span>synapses</span><b>→</b><span>physics</span>
       </div>
     </header>
 
@@ -67,21 +67,38 @@
         <p><b>Guided</b> keeps each sender’s positional receptor code. <b>Shuffled labels</b> permutes the exact same receptor multiset across senders. <b>Random walk</b> removes the chemoaffinity steering term while retaining the same growth grammar.</p>
       </article>
       <article class="explain">
-        <p class="kicker">Current v0 result</p>
+        <p class="kicker">Frozen v0 result</p>
         <h3>Geometry changed while bulk spectrum did not.</h3>
         <p>Across the frozen 16-seed Python receipt, guided and shuffled both form 8 connections with the same effective rank and spectral radius. Guided wiring is shorter and perfectly topographic; shuffling preserves the material counts but breaks the sender↔receiver relation.</p>
       </article>
       <article class="explain authority">
         <p class="kicker">Evidence rule</p>
         <h3>Watch this, but do not score science by eye.</h3>
-        <p><b>Python receipts are authoritative.</b> This browser model is an explanatory microscope. The reproducible experiment, exact controls, and frozen receipt live in the repository.</p>
+        <p><b>Python receipts are authoritative.</b> This browser model is an explanatory microscope. The reproducible experiment, exact controls, and frozen receipts live in the repository.</p>
       </article>
+    </section>
+
+    <section class="panel metric-panel" aria-label="v1 physical bridge result">
+      <div class="panel-head compact">
+        <div>
+          <p class="kicker">v1 physical bridge — frozen 16-seed Python receipt</p>
+          <h2>Same cable. Different place to enter it.</h2>
+        </div>
+      </div>
+      <p class="small"><b>Guided and shuffled use identical passive cable geometry and spectra.</b> Development can only change which dendritic compartment receives the current and therefore the modal coefficients of that input.</p>
+      <div class="metric"><span>visible modes — guided / shuffled</span><strong>4.9148 / 4.9214</strong></div>
+      <div class="metric"><span>95% purification time — guided / shuffled</span><strong>675.857 / 679.523</strong></div>
+      <div class="metric"><span>soma transfer — guided / shuffled</span><strong>0.005213 / 0.003968</strong></div>
+      <p class="small">The mean effect is sparse, not universal. Four of sixteen seeds move the accepted guided input to a physically different relative port; most seeds remain permutation-equivalent and the paired medians are essentially zero. The cable decay spectrum itself is unchanged.</p>
+      <p class="small"><b>Interpretation:</b> v1 exposes an input-placement effect, not a spectral advantage. The next clean test is heterogeneous or developmentally grown dendrites, where development can alter the physical basis itself.</p>
+      <p class="small"><a href="results/v1.json">Open the v1 Python receipt</a> · <a href="docs/RESULTS_V1.md">Read the v1 result note</a></p>
     </section>
 
     <footer>
       <span>GrowingAnttisNeuron</span>
-      <span>v0: fixed dendrites / growing axons / no learning / no evolution</span>
-      <a href="results/v0.json">frozen receipt</a>
+      <span>v0 grows axons / v1 compiles passive cables / no learning / no evolution</span>
+      <a href="results/v0.json">v0 receipt</a>
+      <a href="results/v1.json">v1 receipt</a>
     </footer>
   </main>
   <script src="site.js"></script>
