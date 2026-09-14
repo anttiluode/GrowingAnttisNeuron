@@ -158,6 +158,8 @@ def run(
         raise ValueError("at least one seed is required")
     dev_cfg = development_config or DevelopmentConfig()
     cable_cfg = cable_config or PassiveCableConfig()
+    if cable_cfg.dendrite_scale != 1.0:
+        raise ValueError("v1 cable_config must leave dendrite_scale at 1.0")
 
     per_seed = [
         _seed_receipt(seed, dev_cfg, cable_cfg)
