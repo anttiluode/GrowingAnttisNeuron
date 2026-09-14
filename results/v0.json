@@ -1,0 +1,39 @@
+{
+  "aggregate": {
+    "guided": {
+      "connection_count": {"max": 8.0, "mean": 8.0, "median": 8.0, "min": 8.0},
+      "effective_rank": {"max": 7.999999999999998, "mean": 7.999999999999998, "median": 7.999999999999998, "min": 7.999999999999998},
+      "mean_wiring_length": {"max": 0.6343750000000002, "mean": 0.6263671875000003, "median": 0.6250000000000002, "min": 0.6218750000000002},
+      "slow_mode_separation": {"max": 0.0, "mean": 0.0, "median": 0.0, "min": 0.0},
+      "spectral_radius": {"max": 0.96, "mean": 0.96, "median": 0.96, "min": 0.96},
+      "topographic_error": {"max": 0.0, "mean": 0.0, "median": 0.0, "min": 0.0}
+    },
+    "paired_guided_minus_shuffled": {
+      "connection_count": {"max": 0.0, "mean": 0.0, "median": 0.0, "min": 0.0},
+      "effective_rank": {"max": 0.0, "mean": 0.0, "median": 0.0, "min": 0.0},
+      "mean_wiring_length": {"max": -0.009374999999999911, "mean": -0.06660156250000002, "median": -0.06406250000000002, "min": -0.10937500000000011},
+      "slow_mode_separation": {"max": 0.0, "mean": 0.0, "median": 0.0, "min": 0.0},
+      "spectral_radius": {"max": 0.0, "mean": 0.0, "median": 0.0, "min": 0.0},
+      "topographic_error": {"max": -0.10714285714285715, "mean": -0.359375, "median": -0.3392857142857143, "min": -0.5}
+    },
+    "random_walk": {
+      "connection_count": {"max": 5.0, "mean": 2.75, "median": 2.5, "min": 0.0},
+      "effective_rank": {"max": 5.000000000000001, "mean": 2.75, "median": 2.5, "min": 0.0},
+      "mean_wiring_length": {"max": 0.9750000000000005, "mean": 0.8000520833333336, "median": 0.8500000000000003, "min": 0.0},
+      "slow_mode_separation": {"max": 0.07999999999999996, "mean": 0.0049999999999999975, "median": 0.0, "min": 0.0},
+      "spectral_radius": {"max": 0.96, "mean": 0.955, "median": 0.96, "min": 0.88},
+      "topographic_error": {"max": 1.0, "mean": 0.0625, "median": 0.0, "min": 0.0}
+    },
+    "shuffled_labels": {
+      "connection_count": {"max": 8.0, "mean": 8.0, "median": 8.0, "min": 8.0},
+      "effective_rank": {"max": 7.999999999999998, "mean": 7.999999999999998, "median": 7.999999999999998, "min": 7.999999999999998},
+      "mean_wiring_length": {"max": 0.7343750000000003, "mean": 0.6929687500000004, "median": 0.6890625000000002, "min": 0.6375000000000002},
+      "slow_mode_separation": {"max": 0.0, "mean": 0.0, "median": 0.0, "min": 0.0},
+      "spectral_radius": {"max": 0.96, "mean": 0.96, "median": 0.96, "min": 0.96},
+      "topographic_error": {"max": 0.5, "mean": 0.359375, "median": 0.3392857142857143, "min": 0.10714285714285715}
+    }
+  },
+  "interpretation": "developmental/operator diagnostics only; scientific deltas are recorded with their sign and are never required positive by CI",
+  "seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+  "version": "v0"
+}

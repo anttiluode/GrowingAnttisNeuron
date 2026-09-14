@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GrowingAnttisNeuron — Developmental Microscope</title>
+  <meta name="description" content="A tiny chemoaffinity-style developmental system grows a connectivity matrix, then freezes it for operator analysis.">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">GrowingAnttisNeuron / v0</p>
+        <h1>Grow the matrix first.</h1>
+        <p class="lead">Fixed dendritic targets. Branching axons. Molecular address gradients. Then freeze the anatomy and ask what operator it became.</p>
+      </div>
+      <div class="wall">
+        <span>development</span><b>→</b><span>geometry</span><b>→</b><span>synapses</span><b>→</b><span>operator</span>
+      </div>
+    </header>
+
+    <section class="controls" aria-label="simulation controls">
+      <label>Arm
+        <select id="arm">
+          <option value="guided">guided</option>
+          <option value="shuffled_labels">shuffled labels</option>
+          <option value="random_walk">random walk</option>
+        </select>
+      </label>
+      <label>Seed
+        <input id="seed" type="number" value="7" min="0" step="1">
+      </label>
+      <button id="reset" type="button">Reset embryo</button>
+      <button id="pause" type="button">Pause</button>
+      <button id="step" type="button">Single step</button>
+      <div class="status"><span id="age">age 0</span><span id="state">growing</span></div>
+    </section>
+
+    <section class="lab-grid">
+      <article class="panel stage-panel">
+        <div class="panel-head"><div><p class="kicker">Developmental sheet</p><h2>Axons search; dendrites wait.</h2></div><div class="legend"><i class="sender"></i>sender <i class="receiver"></i>receiver <i class="synapse"></i>synapse</div></div>
+        <canvas id="development-canvas" width="980" height="610" aria-label="developmental axon growth animation"></canvas>
+      </article>
+
+      <aside class="side-stack">
+        <article class="panel metric-panel">
+          <p class="kicker">Frozen anatomy</p>
+          <div class="metric"><span>connections</span><strong id="connection-count">0</strong></div>
+          <div class="metric"><span>topographic error</span><strong id="topographic-error">—</strong></div>
+          <div class="metric"><span>mean path length</span><strong id="mean-path">—</strong></div>
+          <div class="metric"><span>branches</span><strong id="branch-count">8</strong></div>
+          <p class="small">A contact is accepted only when an axon reaches a fixed dendritic arbor and its molecular coordinates are compatible.</p>
+        </article>
+
+        <article class="panel matrix-panel">
+          <div class="panel-head compact"><div><p class="kicker">Grown matrix W</p><h2>Who reached whom?</h2></div></div>
+          <canvas id="matrix-canvas" width="420" height="420" aria-label="connectivity matrix"></canvas>
+        </article>
+      </aside>
+    </section>
+
+    <section class="explain-grid">
+      <article class="explain">
+        <p class="kicker">What changes between arms?</p>
+        <h3>One relation, not the amount of material.</h3>
+        <p><b>Guided</b> keeps each sender’s positional receptor code. <b>Shuffled labels</b> permutes the exact same receptor multiset across senders. <b>Random walk</b> removes the chemoaffinity steering term while retaining the same growth grammar.</p>
+      </article>
+      <article class="explain">
+        <p class="kicker">Current v0 result</p>
+        <h3>Geometry changed while bulk spectrum did not.</h3>
+        <p>Across the frozen 16-seed Python receipt, guided and shuffled both form 8 connections with the same effective rank and spectral radius. Guided wiring is shorter and perfectly topographic; shuffling preserves the material counts but breaks the sender↔receiver relation.</p>
+      </article>
+      <article class="explain authority">
+        <p class="kicker">Evidence rule</p>
+        <h3>Watch this, but do not score science by eye.</h3>
+        <p><b>Python receipts are authoritative.</b> This browser model is an explanatory microscope. The reproducible experiment, exact controls, and frozen receipt live in the repository.</p>
+      </article>
+    </section>
+
+    <footer>
+      <span>GrowingAnttisNeuron</span>
+      <span>v0: fixed dendrites / growing axons / no learning / no evolution</span>
+      <a href="results/v0.json">frozen receipt</a>
+    </footer>
+  </main>
+  <script src="site.js"></script>
+</body>
+</html>
