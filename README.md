@@ -2,7 +2,7 @@
 
 > **Grow the matrix first. Then ask what computation its physics makes possible.**
 
-GrowingAnttisNeuron is a deliberately small developmental bridge into [AnttisNeuron](https://github.com/anttiluode/AnttisNeuron). v0 lets branching axons grow through a two-dimensional developmental sheet toward fixed dendritic arbors under a continuous chemoaffinity-style positional code. Synapses appear only when geometry and molecular compatibility both permit them. v1 then compiles those developed contacts into explicit passive receiver cables and asks how the developed input address couples into the cable's physical modes.
+GrowingAnttisNeuron is a deliberately small developmental bridge into [AnttisNeuron](https://github.com/anttiluode/AnttisNeuron). v0 lets branching axons grow through a two-dimensional developmental sheet toward fixed dendritic arbors under a continuous chemoaffinity-style positional code. v1 compiles those developed contacts into explicit passive receiver cables. v2 then gives receiver addresses four genuinely different passive dendritic phenotypes and asks what happens when the exact address→operator relation is shuffled while the grown anatomy is held fixed.
 
 This is **not** a literal model of embryonic neurodevelopment and it is not evidence for a new biological growth law. It is an instrument for asking what changes when the matrix itself is a developmental product.
 
@@ -92,6 +92,43 @@ The v1 wall sentence is:
 
 See [`docs/RESULTS_V1.md`](docs/RESULTS_V1.md) and [`results/v1.json`](results/v1.json).
 
+## v2 developmental operator codebook
+
+v2 changes the physical basis itself, but does so in the smallest controlled way possible. Receiver somata stay fixed while dendritic offsets are scaled by one of four phenotype values:
+
+```text
+0.70, 0.90, 1.20, 1.45
+```
+
+That scaling changes segment length and membrane area, so capacitance, leak, axial conductance and the capacitance-whitened passive operator are recomputed. The four phenotype labels therefore correspond to genuinely different physical operators.
+
+The crucial matched control is stronger than v0/v1: **one guided anatomy is grown per seed and reused exactly in both v2 arms**. Same axons. Same synapses. Same weights. Same contact coordinates. Same phenotype inventory. Only which receiver address carries which physical phenotype is changed.
+
+`coded_operator` repeats the four-entry address→phenotype map. `shuffled_operator` permutes the exact same phenotype multiset among those receiver addresses. v2 is an oracle/calibration layer: the coded arm defines the desired operator family and therefore has perfect match by construction.
+
+### Frozen v2 result — 16 seeds
+
+| mean metric | coded operator | shuffled operator | coded − shuffled |
+|---|---:|---:|---:|
+| synapse count | 8.000000 | 8.000000 | 0.000000 |
+| phenotype match fraction | **1.000000** | 0.281250 | **+0.718750** |
+| normalized operator-target error | **0.000000** | 0.099527 | **−0.099527** |
+| visible-mode effective count | 4.648693 | 4.610102 | +0.038591 |
+| slow target decay | 0.120918 | 0.120918 | ≈0 |
+| next decay gap | 0.003465 | 0.003485 | −0.000019 |
+| purification time to 95% | 705.601098 | 696.050177 | +9.550921 |
+| soma transfer resistance | 0.027298 | 0.029664 | −0.002366 |
+
+The clean result is the operator relation itself: exact phenotype shuffling drops mean address/operator match from **1.0 to 0.28125** and produces **0.099527** mean normalized operator-target error without altering the grown anatomy or the phenotype inventory.
+
+But this is not a functional win. The paired median changes in modal visibility, gap, purification time and soma transfer are essentially zero, and purification differences change sign across seeds. v2 therefore proves only that a developmental address can stand in for a physical operator family in this toy system. It does **not** show that the chosen codebook is computationally privileged.
+
+The v2 wall sentence is:
+
+> **A four-entry developmental address can name four genuinely different passive dendritic operators on the exact same grown network; shuffling only that address→operator relation breaks operator compatibility, but does not confer a broad purification advantage.**
+
+See [`docs/RESULTS_V2.md`](docs/RESULTS_V2.md) and [`results/v2.json`](results/v2.json).
+
 ## Run it
 
 ```bash
@@ -99,25 +136,42 @@ python -m pip install -e ".[test]"
 pytest -q
 python experiments/run_v0.py --seeds 16 --out /tmp/v0-full.json
 python experiments/run_v1.py --seeds 16 --out /tmp/v1-full.json
+python experiments/run_v2.py --seeds 16 --out /tmp/v2-full.json
 ```
 
-Both CLIs emit deterministic receipts. `results/v0.json` and `results/v1.json` freeze the canonical 16-seed aggregates used in the writeups.
+All three CLIs emit deterministic receipts. `results/v0.json`, `results/v1.json` and `results/v2.json` freeze the canonical 16-seed runs used in the writeups.
 
-CI runs Python 3.11 and 3.12, unit/invariant tests, exact control checks, frozen aggregate regressions, a JavaScript syntax check for the Pages microscope, and v0/v1 scientific smoke runs. No preferred scientific sign is required by CI.
+CI runs Python 3.11 and 3.12, unit/invariant tests, exact control checks, frozen receipt regressions, a JavaScript syntax check for the Pages microscope, and v0/v1/v2 scientific smoke runs. No preferred scientific sign is required by CI.
 
 ## What is physical and what is still abstract
 
 The developmental geometry is explicit: somata, dendritic sample points, growing axon branches, path length and synapse capture all exist in 2-D space. Molecular identity is represented by continuous positional coordinates rather than unique neuron IDs.
 
-v1 adds an explicit passive compartment substrate: membrane capacitance, leak, axial conductance, implicit cable dynamics, generalized decay modes, point-current synaptic inputs, soma DC transfer, and an oracle passive-purification diagnostic. The parameters are normalized rather than fitted to a particular biological neuron.
+v1 adds an explicit passive compartment substrate: membrane capacitance, leak, axial conductance, implicit cable dynamics, generalized decay modes, point-current synaptic inputs, soma DC transfer, and an oracle passive-purification diagnostic. v2 adds real morphological/operator heterogeneity by scaling dendritic geometry and recompiling that substrate. The parameters are normalized rather than fitted to a particular biological neuron.
 
-Still absent are active dendritic channels, spiking, AIS dynamics, activity-dependent plasticity, reward and evolution. Most importantly, dendrites themselves still do not grow, so development currently chooses an address inside a repeated physical basis instead of constructing the basis.
+Still absent are active dendritic channels, spiking, AIS dynamics, activity-dependent plasticity, reward and evolution. Most importantly, v2 still **assigns** phenotype identity through an oracle codebook. The signals do not yet cause the dendrite to become the operator it needs to be.
 
-## Next bridge, not another pile of mechanisms
+## Next bridge: let statistics grow the operator
 
-v0 showed that a tiny developmental program can grow a relation that bulk matrix spectrum misses. v1 showed that, with fixed repeated dendrites, turning that anatomy into a cable mostly preserves permutation equivalence; only a sparse input-placement effect survives.
+v0 grew the wiring relation. v1 showed what a developed input address means inside a repeated physical basis. v2 proved that developmental identity can also be coupled to genuinely different physical bases, but its particular codebook has no broad functional advantage.
 
-The next useful experiment is therefore **morphological heterogeneity/development**: let receiver dendrites differ or grow under a controlled rule, then ask whether development changes the physical eigenspaces themselves. That test comes before stacking on learning, AIS homeostasis, or evolution.
+The next clean experiment therefore removes the phenotype ID. Every receiver begins physically identical. Equal-power input processes with different temporal correlation statistics drive the same local growth/shrinkage rule. The rule sees only a local voltage statistic and a fixed homeostatic setpoint—not sender ID, desired phenotype, eigenspectrum, soma reward or task loss.
+
+The target causal chain is:
+
+```text
+signal statistics
+      ↓
+local dendritic voltage statistics
+      ↓
+local growth / shrinkage
+      ↓
+different morphology
+      ↓
+different passive operator
+```
+
+If distinct statistics reliably produce distinct frozen operators while same-statistics and temporal-order-destroyed controls collapse that diversity, then the matrix has begun manufacturing **different kinds of matrix elements** from experience rather than receiving their identities from an oracle.
 
 ## Project documents
 
@@ -127,5 +181,6 @@ The next useful experiment is therefore **morphological heterogeneity/developmen
 - [`docs/superpowers/specs/2026-09-14-v1-physical-bridge-design.md`](docs/superpowers/specs/2026-09-14-v1-physical-bridge-design.md) — v1 design.
 - [`docs/superpowers/plans/2026-09-14-v1-physical-bridge.md`](docs/superpowers/plans/2026-09-14-v1-physical-bridge.md) — v1 implementation plan.
 - [`docs/RESULTS_V1.md`](docs/RESULTS_V1.md) — v1 interpretation.
+- [`docs/RESULTS_V2.md`](docs/RESULTS_V2.md) — v2 operator-codebook calibration and its negative functional result.
 
 Experimental computational-development code; scientific failures are kept rather than tuned away.
