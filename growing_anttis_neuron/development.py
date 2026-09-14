@@ -124,7 +124,6 @@ def _sender_receptors(config: DevelopmentConfig) -> np.ndarray:
     if config.n_senders == config.n_receivers:
         target_y = sender_y
     else:
-        # Preserve normalized topographic position when population sizes differ.
         q = np.linspace(0.0, 1.0, config.n_senders)
         target_y = 0.12 + 0.76 * q
     return np.column_stack([np.full(config.n_senders, config.target_x), target_y])
@@ -158,7 +157,7 @@ def make_world(
     arm: Arm = "guided",
 ) -> tuple[tuple[Neuron, ...], tuple[Neuron, ...], tuple[DendritePoint, ...]]:
     """Create matched soma/dendrite geometry and arm-specific sender labels."""
-    del seed  # Geometry is fixed; the seed controls growth noise and label shuffle.
+    del seed
     cfg = config or DevelopmentConfig()
     if arm not in ("guided", "shuffled_labels", "random_walk"):
         raise ValueError(f"unknown developmental arm: {arm}")
@@ -278,11 +277,12 @@ def develop(
         raise ValueError(f"unknown developmental arm: {arm}")
 
     base_senders, receivers, dendrites = make_world(seed, cfg, arm=arm)
-    rng = np.random.default_rng(np.random.SeedSequence([seed, 9107]))
+    growth_rng = np.random.default_rng(np.random.SeedSequence([seed, 9107]))
+    label_rng = np.random.default_rng(np.random.SeedSequence([seed, 9106]))
 
     receptor_values = np.asarray([n.molecular for n in base_senders], dtype=float)
     if arm == "shuffled_labels" and len(receptor_values) > 1:
-        permutation = rng.permutation(len(receptor_values))
+        permutation = label_rng.permutation(len(receptor_values))
         if np.array_equal(permutation, np.arange(len(receptor_values))):
             permutation = np.roll(permutation, 1)
         receptor_values = receptor_values[permutation]
@@ -328,7 +328,7 @@ def develop(
                 tip,
                 sender.molecular,
                 occupied,
-                rng,
+                growth_rng,
                 cfg,
                 chemo_enabled=arm != "random_walk",
             )
@@ -360,9 +360,9 @@ def develop(
             if (
                 branch_counts[tip.sender] < cfg.max_branches_per_sender
                 and len(tip.points) >= 5
-                and rng.random() < cfg.branch_probability
+                and growth_rng.random() < cfg.branch_probability
             ):
-                direction = -1.0 if rng.random() < 0.5 else 1.0
+                direction = -1.0 if growth_rng.random() < 0.5 else 1.0
                 child = _Tip(
                     sender=tip.sender,
                     branch_index=next_branch_index,
