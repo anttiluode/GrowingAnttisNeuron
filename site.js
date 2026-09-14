@@ -61,7 +61,7 @@
     ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="#07100c";ctx.fillRect(0,0,canvas.width,canvas.height);
     ctx.strokeStyle="#12231a";ctx.lineWidth=1; for(let i=1;i<10;i++){ctx.beginPath();ctx.moveTo(i*canvas.width/10,0);ctx.lineTo(i*canvas.width/10,canvas.height);ctx.stroke();}
     ctx.strokeStyle="#365447";ctx.lineWidth=1.4; for(let r=0;r<N;r++){const pts=sim.dendrites.filter(d=>d.receiver===r); const cx=sx(.88),cy=sy(sim.y[r]); for(const d of pts){ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(sx(d.x),sy(d.y));ctx.stroke();}}
-    sim.tips.forEach((tip,idx)=>{ctx.strokeStyle=`hsla(${85+(tip.sender*18)},80%,68%,${tip.alive?.78:.42})`;ctx.lineWidth=idx<N?2.2:1.3;ctx.beginPath();tip.points.forEach((p,i)=>i?ctx.lineTo(sx(p[0]),sy(p[1])):ctx.moveTo(sx(p[0]),sy(p[1])));ctx.stroke();});
+    sim.tips.forEach((tip,idx)=>{ctx.strokeStyle=`hsla(${85+(tip.sender*18)},80%,68%,${tip.alive ? .78 : .42})`;ctx.lineWidth=idx<N?2.2:1.3;ctx.beginPath();tip.points.forEach((p,i)=>i?ctx.lineTo(sx(p[0]),sy(p[1])):ctx.moveTo(sx(p[0]),sy(p[1])));ctx.stroke();});
     for(let i=0;i<N;i++){ctx.fillStyle="#b9ff66";ctx.beginPath();ctx.arc(sx(.08),sy(sim.y[i]),6,0,Math.PI*2);ctx.fill();ctx.fillStyle="#6fe8d5";ctx.beginPath();ctx.arc(sx(.88),sy(sim.y[i]),7,0,Math.PI*2);ctx.fill();}
     ctx.fillStyle="#ffcf70";sim.synapses.forEach(s=>{ctx.beginPath();ctx.arc(sx(s.x),sy(s.y),5,0,Math.PI*2);ctx.fill();});
     drawMatrix(); ageEl.textContent=`age ${sim.age}`;stateEl.textContent=sim.age>=STEPS?"frozen":paused?"paused":"growing";
