@@ -26,3 +26,14 @@ jobs:
         run: python experiments/run_v0.py --seeds 4 --out /tmp/v0-smoke.json
       - name: v1 scientific smoke run
         run: python experiments/run_v1.py --seeds 4 --out /tmp/v1-smoke.json
+      - name: v2 scientific smoke run
+        run: python experiments/run_v2.py --seeds 4 --out /tmp/v2-smoke.json
+      - name: Canonical v2 receipt
+        if: matrix.python-version == '3.11'
+        run: python experiments/run_v2.py --seeds 16 --out /tmp/v2.json
+      - name: Archive canonical v2 receipt
+        if: matrix.python-version == '3.11'
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-v2-receipt
+          path: /tmp/v2.json
