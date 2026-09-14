@@ -29,4 +29,4 @@ jobs:
       - name: v2 scientific smoke run
         run: python experiments/run_v2.py --seeds 4 --out /tmp/v2-smoke.json
       - name: v3 scientific smoke run
-        run: python experiments/run_v3.py --out /tmp/v3-smoke.json && cat /tmp/v3-smoke.json
+        run: python experiments/run_v3.py --out /tmp/v3-smoke.json
