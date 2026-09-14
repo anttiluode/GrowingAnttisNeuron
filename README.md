@@ -2,7 +2,7 @@
 
 > **Grow the matrix first. Then ask what computation its physics makes possible.**
 
-GrowingAnttisNeuron is a deliberately small developmental bridge into [AnttisNeuron](https://github.com/anttiluode/AnttisNeuron). v0 lets branching axons grow through a two-dimensional developmental sheet toward fixed dendritic arbors under a continuous chemoaffinity-style positional code. v1 compiles those developed contacts into explicit passive receiver cables. v2 then gives receiver addresses four genuinely different passive dendritic phenotypes and asks what happens when the exact address→operator relation is shuffled while the grown anatomy is held fixed.
+GrowingAnttisNeuron is a deliberately small developmental bridge into [AnttisNeuron](https://github.com/anttiluode/AnttisNeuron). v0 lets branching axons grow through a two-dimensional developmental sheet toward fixed dendritic arbors under a continuous chemoaffinity-style positional code. v1 compiles those developed contacts into explicit passive receiver cables. v2 gives receiver addresses four genuinely different passive dendritic phenotypes and asks what happens when the exact address→operator relation is shuffled while grown anatomy is held fixed. v3 removes that oracle phenotype identity: equal-power streams with different temporal correlations drive one local voltage homeostat, and the signal statistics themselves grow initially identical fixed-lineage dendrites into different passive operators.
 
 This is **not** a literal model of embryonic neurodevelopment and it is not evidence for a new biological growth law. It is an instrument for asking what changes when the matrix itself is a developmental product.
 
@@ -129,6 +129,35 @@ The v2 wall sentence is:
 
 See [`docs/RESULTS_V2.md`](docs/RESULTS_V2.md) and [`results/v2.json`](results/v2.json).
 
+## v3 signal-grown operators
+
+v3 removes the phenotype ID. One receiver begins from the same dendritic morphology in every condition, its branch ancestry is frozen, input variance is always `1.0`, and only temporal autocorrelation changes:
+
+```text
+rho = 0.0, 0.2, 0.4, 0.6
+```
+
+For each morphology the exact stationary covariance of the passive cable driven by that AR(1) current is solved. Growth sees only the RMS voltage at one local compartment relative to one common setpoint. It does not see the correlation label, phenotype, spectrum, sender ID, soma reward, task loss, or desired operator.
+
+The shared setpoint is the `rho=0` response at scale `1.0`: **197.5413457**. From the identical starting scale `1.0`, the four conditions converge to:
+
+| rho | final scale |
+|---:|---:|
+| 0.0 | **1.000000** |
+| 0.2 | **1.292112** |
+| 0.4 | **1.669088** |
+| 0.6 | **2.237380** |
+
+The ordering is robust across the canonical receiver rather than being chosen at one lucky port. At scale `1.0`, local RMS increases strictly with temporal correlation at **7/7 dendritic compartments**. Across eight tested morphology scales, increasing scale lowers local RMS for **28/28 compartment×correlation combinations**. After growth, the `rho=0` cable remains the baseline operator and the positively correlated streams end at nonzero operator distance because segment length, membrane area, capacitance, leak and axial conductance have all been recompiled.
+
+This is still not a task win. It is a causal bridge.
+
+The v3 wall sentence is:
+
+> **Equal-power streams that differ only in temporal correlation can drive the same local voltage homeostat to grow identical starting dendrites into different passive operators; in this canonical receiver the ordering holds at all seven dendritic ports.**
+
+See [`docs/RESULTS_V3.md`](docs/RESULTS_V3.md). `experiments/run_v3.py` emits the deterministic v3 receipt.
+
 ## Run it
 
 ```bash
@@ -137,41 +166,42 @@ pytest -q
 python experiments/run_v0.py --seeds 16 --out /tmp/v0-full.json
 python experiments/run_v1.py --seeds 16 --out /tmp/v1-full.json
 python experiments/run_v2.py --seeds 16 --out /tmp/v2-full.json
+python experiments/run_v3.py --out /tmp/v3-full.json
 ```
 
-All three CLIs emit deterministic receipts. `results/v0.json`, `results/v1.json` and `results/v2.json` freeze the canonical 16-seed runs used in the writeups.
+All four CLIs emit deterministic receipts. `results/v0.json`, `results/v1.json` and `results/v2.json` freeze the canonical v0–v2 runs; v3 is deterministic and its frozen scientific interpretation is in `docs/RESULTS_V3.md`.
 
-CI runs Python 3.11 and 3.12, unit/invariant tests, exact control checks, frozen receipt regressions, a JavaScript syntax check for the Pages microscope, and v0/v1/v2 scientific smoke runs. No preferred scientific sign is required by CI.
+CI runs Python 3.11 and 3.12, unit/invariant tests, exact control checks, receipt regressions, a JavaScript syntax check for the Pages microscope, and v0/v1/v2/v3 scientific smoke runs. No preferred scientific sign is required by CI.
 
 ## What is physical and what is still abstract
 
 The developmental geometry is explicit: somata, dendritic sample points, growing axon branches, path length and synapse capture all exist in 2-D space. Molecular identity is represented by continuous positional coordinates rather than unique neuron IDs.
 
-v1 adds an explicit passive compartment substrate: membrane capacitance, leak, axial conductance, implicit cable dynamics, generalized decay modes, point-current synaptic inputs, soma DC transfer, and an oracle passive-purification diagnostic. v2 adds real morphological/operator heterogeneity by scaling dendritic geometry and recompiling that substrate. The parameters are normalized rather than fitted to a particular biological neuron.
+v1 adds an explicit passive compartment substrate: membrane capacitance, leak, axial conductance, implicit cable dynamics, generalized decay modes, point-current synaptic inputs, soma DC transfer, and an oracle passive-purification diagnostic. v2 adds real morphological/operator heterogeneity by scaling dendritic geometry and recompiling that substrate. v3 adds fixed-lineage morphology change driven only by a local stationary voltage statistic under temporally correlated input. The parameters are normalized rather than fitted to a particular biological neuron.
 
-Still absent are active dendritic channels, spiking, AIS dynamics, activity-dependent plasticity, reward and evolution. Most importantly, v2 still **assigns** phenotype identity through an oracle codebook. The signals do not yet cause the dendrite to become the operator it needs to be.
+Still absent are active dendritic channels, spiking, AIS dynamics, branch-specific growth, reward and evolution. v3 changes one scalar whole-arbor scale rather than growing independent branches, uses stationary AR(1) input, and calibrates its homeostatic setpoint from one baseline condition. It proves that signal statistics can create operator diversity in this toy substrate; it does not prove that the resulting operators are computationally useful.
 
-## Next bridge: let statistics grow the operator
+## Next bridge: make the grown state useful
 
-v0 grew the wiring relation. v1 showed what a developed input address means inside a repeated physical basis. v2 proved that developmental identity can also be coupled to genuinely different physical bases, but its particular codebook has no broad functional advantage.
+v0 grew the wiring relation. v1 put those contacts into a physical basis. v2 proved that developmental identity can name different operators but needed an oracle codebook. v3 removed that codebook and showed that local temporal statistics can manufacture different operators from one starting substrate.
 
-The next clean experiment therefore removes the phenotype ID. Every receiver begins physically identical. Equal-power input processes with different temporal correlation statistics drive the same local growth/shrinkage rule. The rule sees only a local voltage statistic and a fixed homeostatic setpoint—not sender ID, desired phenotype, eigenspectrum, soma reward or task loss.
-
-The target causal chain is:
+The next useful question is therefore functional rather than anatomical:
 
 ```text
-signal statistics
+stream statistics
       ↓
-local dendritic voltage statistics
+locally adapted physical state / memory
       ↓
-local growth / shrinkage
+current state persists internally
       ↓
-different morphology
+only useful change is communicated
       ↓
-different passive operator
+does a downstream task improve per unit compute / communication?
 ```
 
-If distinct statistics reliably produce distinct frozen operators while same-statistics and temporal-order-destroyed controls collapse that diversity, then the matrix has begun manufacturing **different kinds of matrix elements** from experience rather than receiving their identities from an oracle.
+A clean AI-facing test would keep state size fixed and compare a fixed passive/SSM-like memory against locally homeostatic memory on a nonstationary streaming task. A second arm can make communication event-driven—emit only an innovation/change signal while the internal state continues to integrate. That would test usefulness without claiming that a biological spike is literally a mathematical derivative.
+
+Before that, branch-specific growth is the obvious physical refinement: let different dendritic regions see different local statistics and change independently while ancestry remains fixed. Then the experiment can ask whether one arbor self-organizes a bank of distinct local timescales instead of merely choosing one global scale.
 
 ## Project documents
 
@@ -182,5 +212,6 @@ If distinct statistics reliably produce distinct frozen operators while same-sta
 - [`docs/superpowers/plans/2026-09-14-v1-physical-bridge.md`](docs/superpowers/plans/2026-09-14-v1-physical-bridge.md) — v1 implementation plan.
 - [`docs/RESULTS_V1.md`](docs/RESULTS_V1.md) — v1 interpretation.
 - [`docs/RESULTS_V2.md`](docs/RESULTS_V2.md) — v2 operator-codebook calibration and its negative functional result.
+- [`docs/RESULTS_V3.md`](docs/RESULTS_V3.md) — v3 signal-grown operator result and limitations.
 
 Experimental computational-development code; scientific failures are kept rather than tuned away.
