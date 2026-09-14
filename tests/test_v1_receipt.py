@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from experiments.run_v1 import run
 
 
@@ -57,3 +60,8 @@ def test_v1_rejects_empty_seed_ensemble() -> None:
         assert "seed" in str(exc).lower()
     else:
         raise AssertionError("empty v1 ensemble must be rejected")
+
+
+def test_frozen_v1_receipt_matches_canonical_run() -> None:
+    frozen = json.loads(Path("results/v1.json").read_text(encoding="utf-8"))
+    assert frozen == run(seeds=range(16))
