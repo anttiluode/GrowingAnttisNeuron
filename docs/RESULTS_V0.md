@@ -9,7 +9,7 @@ This is a calibration of the developmental instrument, not a claim that the mode
 ## Predeclared matched arms
 
 - **guided** — sender positional receptor codes remain attached to their original sender positions.
-- **shuffled_labels** — the exact receptor-vector multiset is permuted across sender identities. Receiver ligands, soma positions, dendrites, growth grammar, growth-noise stream, and scalar label distributions are retained.
+- **shuffled_labels** — the exact receptor-vector multiset is permuted across sender identities. Receiver ligands, soma positions, dendrites, growth grammar, growth-noise seed, and scalar label distributions are retained. The label permutation itself uses a separate RNG stream so it cannot consume growth noise.
 - **random_walk** — the chemoaffinity steering term is disabled while the rest of the growth grammar remains.
 
 The canonical receipt uses seeds `0..15`.
@@ -29,19 +29,23 @@ For every canonical seed, guided uses less wiring than shuffled labels. The pair
 
 ## What this actually says
 
-The intact positional code and its exact-multiset shuffle build matrices with the **same connection count, the same effective rank, and the same frozen-operator spectral radius**, yet very different geometry. Guided development produces the identity-like topographic map; shuffling produces a permutation-like map. The developmental relation is therefore visible in *which sender reaches which receiver* and in wiring cost, not in these bulk spectral diagnostics.
+The intact positional code and its exact-multiset shuffle build matrices with the **same connection count and the same singular-value effective rank**, yet very different geometry. Guided development produces the identity-like topographic map; shuffling produces a permutation-like map. The developmental relation is therefore visible in *which sender reaches which receiver* and in wiring cost, not in these bulk matrix-capacity diagnostics.
 
 That is useful because it is the intended control: the amount of molecular material and the gross matrix capacity are not enough to recover the organized map.
 
-## Important negative / limitation
+## Important negatives / limitations
 
-`slow_mode_separation` is exactly zero for guided and shuffled. With this v0 symmetric bipartite embedding, permutation-like full-rank maps produce paired eigenvalue magnitudes, so this particular metric cannot distinguish the two arms. It is retained rather than redefined after seeing the result.
+The reported operator spectral radius is intentionally stability-normalized. The symmetric bipartite block is scaled before applying fixed leak and coupling, so a nonempty full-strength map lands at the same top stability scale (`0.96`). That value should **not** be read as a discovered equality between guided and shuffled dynamics.
+
+`slow_mode_separation` is exactly zero for guided and shuffled. With this v0 symmetric bipartite embedding, full permutation-like maps carry repeated top singular values, so this particular metric cannot distinguish the two arms. It is retained rather than redefined after seeing the result.
 
 The random-walk topographic error also needs careful interpretation. Random growth forms only 2.75 accepted connections on average, and the molecular compatibility threshold strongly filters which of those contacts survive. Its low mean topographic error therefore does **not** mean random growth made a good complete map.
 
+Finally, guided and shuffled begin from the same growth RNG seed and label shuffling cannot shift that RNG stream. Once the chemoaffinity term makes their geometries diverge, later random draws are not guaranteed to remain event-for-event paired. v0 therefore has matched seeds, not a fully pre-generated common random tape.
+
 ## Wall sentence
 
-> **A tiny positional chemoaffinity code can grow a complete topographic matrix with shorter wiring; exact label shuffling preserves connection count and bulk spectrum but destroys the sender↔receiver map.**
+> **A tiny positional chemoaffinity code can grow a complete topographic matrix with shorter wiring; exact label shuffling preserves connection count and singular spectrum but destroys the sender↔receiver map.**
 
 ## What v0 has not tested
 
