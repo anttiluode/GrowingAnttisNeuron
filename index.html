@@ -4,16 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>GrowingAnttisNeuron — Developmental Microscope</title>
-  <meta name="description" content="A tiny developmental system grows a connectivity matrix, then compiles developed contacts into passive cable input ports.">
+  <meta name="description" content="A tiny developmental system grows a connectivity matrix, compiles passive cables, then asks whether developmental address can stand in for physical operator identity.">
   <link rel="stylesheet" href="site.css">
 </head>
 <body>
   <main class="shell">
     <header class="hero">
       <div>
-        <p class="eyebrow">GrowingAnttisNeuron / v0 development + v1 physical bridge</p>
+        <p class="eyebrow">GrowingAnttisNeuron / v0 growth + v1 cable physics + v2 operator codebook</p>
         <h1>Grow the matrix first.</h1>
-        <p class="lead">Fixed dendritic targets. Branching axons. Molecular address gradients. Then freeze the anatomy and ask how developed inputs enter a physical cable basis.</p>
+        <p class="lead">Branching axons. Molecular addresses. Passive dendritic operators. Freeze each causal step and ask what development actually bought us.</p>
       </div>
       <div class="wall">
         <span>development</span><b>→</b><span>geometry</span><b>→</b><span>synapses</span><b>→</b><span>physics</span>
@@ -90,15 +90,33 @@
       <div class="metric"><span>95% purification time — guided / shuffled</span><strong>675.857 / 679.523</strong></div>
       <div class="metric"><span>soma transfer — guided / shuffled</span><strong>0.005213 / 0.003968</strong></div>
       <p class="small">The mean effect is sparse, not universal. Four of sixteen seeds move the accepted guided input to a physically different relative port; most seeds remain permutation-equivalent and the paired medians are essentially zero. The cable decay spectrum itself is unchanged.</p>
-      <p class="small"><b>Interpretation:</b> v1 exposes an input-placement effect, not a spectral advantage. The next clean test is heterogeneous or developmentally grown dendrites, where development can alter the physical basis itself.</p>
+      <p class="small"><b>Interpretation:</b> v1 exposes an input-placement effect, not a spectral advantage.</p>
       <p class="small"><a href="results/v1.json">Open the v1 Python receipt</a> · <a href="docs/RESULTS_V1.md">Read the v1 result note</a></p>
+    </section>
+
+    <section class="panel metric-panel" aria-label="v2 developmental operator codebook result">
+      <div class="panel-head compact">
+        <div>
+          <p class="kicker">v2 operator codebook — frozen 16-seed Python receipt</p>
+          <h2>Same grown network. Different physical kinds of receiver.</h2>
+        </div>
+      </div>
+      <p class="small">v2 grows the organism once per seed, then compiles the <b>same axons, synapses, weights and contacts</b> against four dendritic scale phenotypes: 0.70, 0.90, 1.20 and 1.45. The control shuffles the exact same phenotype inventory among receiver addresses.</p>
+      <div class="metric"><span>phenotype match — coded / shuffled</span><strong>1.0000 / 0.2813</strong></div>
+      <div class="metric"><span>operator-target error — coded / shuffled</span><strong>0.0000 / 0.0995</strong></div>
+      <div class="metric"><span>95% purification time — coded / shuffled</span><strong>705.601 / 696.050</strong></div>
+      <div class="metric"><span>soma transfer — coded / shuffled</span><strong>0.02730 / 0.02966</strong></div>
+      <p class="small"><b>The calibration works; the functional win does not.</b> Exact address→phenotype shuffling breaks operator compatibility while preserving the grown anatomy and material inventory. But modal visibility, purification and transfer have paired medians essentially at zero, and purification changes sign across seeds.</p>
+      <p class="small"><b>Interpretation:</b> a developmental address can stand in for physical operator identity, but v2 is still an oracle codebook. The next experiment removes phenotype IDs and asks whether equal-power signals with different temporal statistics can locally grow different operators from the same initial morphology.</p>
+      <p class="small"><a href="results/v2.json">Open the v2 Python receipt</a> · <a href="docs/RESULTS_V2.md">Read the v2 result note</a></p>
     </section>
 
     <footer>
       <span>GrowingAnttisNeuron</span>
-      <span>v0 grows axons / v1 compiles passive cables / no learning / no evolution</span>
+      <span>v0 grows wiring / v1 compiles cables / v2 assigns operator phenotypes / no reward / no evolution</span>
       <a href="results/v0.json">v0 receipt</a>
       <a href="results/v1.json">v1 receipt</a>
+      <a href="results/v2.json">v2 receipt</a>
     </footer>
   </main>
   <script src="site.js"></script>

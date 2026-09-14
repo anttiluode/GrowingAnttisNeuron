@@ -139,6 +139,13 @@ def _seed_receipt(
     }
 
 
+def _v1_cable_config_dict(config: PassiveCableConfig) -> dict[str, float]:
+    """Serialize only parameters that existed when the v1 receipt was frozen."""
+    values = asdict(config)
+    values.pop("dendrite_scale", None)
+    return values
+
+
 def run(
     *,
     seeds: Iterable[int],
@@ -151,6 +158,8 @@ def run(
         raise ValueError("at least one seed is required")
     dev_cfg = development_config or DevelopmentConfig()
     cable_cfg = cable_config or PassiveCableConfig()
+    if cable_cfg.dendrite_scale != 1.0:
+        raise ValueError("v1 cable_config must leave dendrite_scale at 1.0")
 
     per_seed = [
         _seed_receipt(seed, dev_cfg, cable_cfg)
@@ -189,7 +198,7 @@ def run(
         ),
         "seeds": seed_list,
         "development_config": asdict(dev_cfg),
-        "cable_config": asdict(cable_cfg),
+        "cable_config": _v1_cable_config_dict(cable_cfg),
         "aggregate": aggregate,
         "per_seed": per_seed,
         "interpretation": (

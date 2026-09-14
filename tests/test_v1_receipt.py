@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from experiments.run_v1 import run
+from growing_anttis_neuron.physical import PassiveCableConfig
 
 
 _METRICS = {
@@ -98,6 +99,15 @@ def test_v1_rejects_empty_seed_ensemble() -> None:
         assert "seed" in str(exc).lower()
     else:
         raise AssertionError("empty v1 ensemble must be rejected")
+
+
+def test_v1_rejects_nonhistorical_dendrite_scale() -> None:
+    try:
+        run(seeds=[0], cable_config=PassiveCableConfig(dendrite_scale=1.2))
+    except ValueError as exc:
+        assert "dendrite_scale" in str(exc)
+    else:
+        raise AssertionError("v1 must not hide a nonhistorical dendrite_scale")
 
 
 def test_receipt_comparison_rejects_scientific_scale_float_changes() -> None:
