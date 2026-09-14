@@ -32,6 +32,21 @@ def _summary(values: list[float]) -> dict[str, float]:
     }
 
 
+def _compact_seed(seed_receipt: dict) -> dict:
+    """Keep frozen evidence needed for matched comparisons, not full trajectories."""
+    return {
+        "seed": int(seed_receipt["seed"]),
+        "controls": {
+            "receptor_multiset_exact": bool(seed_receipt["controls"]["receptor_multiset_exact"]),
+            "ligand_multiset_exact": bool(seed_receipt["controls"]["ligand_multiset_exact"]),
+        },
+        "arms": {
+            arm: {"metrics": dict(seed_receipt["arms"][arm]["metrics"])}
+            for arm in _ARMS
+        },
+    }
+
+
 def run(
     *,
     seeds: Iterable[int],
@@ -42,7 +57,8 @@ def run(
     if not seed_list:
         raise ValueError("at least one seed is required")
     cfg = config or DevelopmentConfig()
-    per_seed = [receipt_for_seed(seed, cfg) for seed in seed_list]
+    full_receipts = [receipt_for_seed(seed, cfg) for seed in seed_list]
+    per_seed = [_compact_seed(receipt) for receipt in full_receipts]
 
     aggregate: dict[str, dict] = {}
     for arm in _ARMS:
